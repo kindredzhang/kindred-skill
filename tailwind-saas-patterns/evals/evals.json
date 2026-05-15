@@ -5,19 +5,37 @@
       "id": 1,
       "name": "scaffold-new-project",
       "prompt": "我新建了一个 Next.js 项目，帮我按我们项目那套模式把样式体系搭建起来：theme.css、globals.css、tailwind.config、cn() 工具函数，再加一份 demo 落地页（Hero、Feature、Stats、Testimonial、FAQ、CTA、Footer）。页面要可以直接跑起来看到效果。",
-      "expected_output": "生成完整的样式体系文件和 demo 落地页组件，所有文件可直接使用"
+      "expected_output": "根据检测到的 Tailwind 版本（v3/v4），生成对应版本的样式体系文件和 demo 落地页组件"
     },
     {
       "id": 2,
-      "name": "query-layout-technique",
-      "prompt": "我在写一个 Features 区块，用了 3 列 grid 但手机上看起来很挤。而且每个 card 的高度不一样，很不整齐。这个项目里是怎么处理这种布局的？",
-      "expected_output": "给出 gap 断点组合方案（默认单列 → md:2列 → lg:3列）、卡片高度对齐技巧"
+      "name": "query-color-system",
+      "prompt": "我想给我的按钮加一个 success 状态颜色，就是绿色的那种，怎么做？然后我现在的 primary 颜色是橙色想换成蓝色。",
+      "expected_output": "指导扩展语义色（--success / --success-foreground），给出 v3: tailwind.config.ts 映射或 v4: @theme inline 的两种写法，并给出 HSL 选蓝色的参考值"
     },
     {
       "id": 3,
-      "name": "query-visual-effect",
-      "prompt": "我想给我的 hero 区域加一个渐变文字高亮效果，然后下面放几行品牌 Logo 展示（黑白色，暗色模式下自动反色）。这个项目的实现方式是什么？",
-      "expected_output": "给出 bg-gradient-to-r + bg-clip-text 和 dark:invert 的完整代码示例"
+      "name": "query-animation-stagger",
+      "prompt": "我的 Feature 区块有 6 个卡片，我想让它们从上往下逐个出现，一个一个飘进来。不要 framer-motion，用 CSS 能实现吗？",
+      "expected_output": "给出 animate-fade-up + CSS 变量 --animation-delay 的 stagger 方案，用 index * 150ms 依次延迟"
+    },
+    {
+      "id": 4,
+      "name": "query-layout-responsive",
+      "prompt": "我在写一个 Features 区块，用了 3 列 grid 但手机上看起来很挤。而且每个 card 的高度不一样，很不整齐。",
+      "expected_output": "给出 grid 断点组合方案（默认1列 → md:2列 → lg:3列）、gap 层次选择、卡片高度自动撑开的解决思路"
+    },
+    {
+      "id": 5,
+      "name": "query-skeleton-loading",
+      "prompt": "我的数据列表加载时会布局跳一下，我想加个骨架屏占位怎么做？",
+      "expected_output": "给出 Skeleton 组件模板 + animate-shimmer 用法 + 列表骨架屏 + 图片加载占位的完整方案"
+    },
+    {
+      "id": 6,
+      "name": "detect-tailwind-version",
+      "prompt": "帮我看看我这个项目用的是什么版本？然后搭一下样式体系。",
+      "expected_output": "先检测 tailwindcss 版本（v3/v4），然后按对应版本生成样式文件"
     }
   ]
 }

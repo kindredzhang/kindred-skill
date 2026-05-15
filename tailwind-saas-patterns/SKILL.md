@@ -1,139 +1,168 @@
 ---
 name: tailwind-saas-patterns
 description: >
-  SaaS 项目的 Tailwind CSS 样式编排参考手册 + 项目脚手架。
-  当用户要创建新项目并需要搭建样式体系（CSS变量/theme.css/tailwind.config）时，
-  或者用户询问 Tailwind CSS 布局技巧、视觉效果实现、组件样式编写时，
-  必须调用此 skill。即使是"我要初始化项目"、"怎么写样式"、"帮我搭个好看的结构"这类泛问题也应触发。
+  Tailwind CSS 样式编排参考手册 + 项目脚手架。专为 CSS 不熟练者设计。
+  当用户要搭建样式体系、问布局技巧、色彩搭配、动画实现、组件状态时触发。
+  能自动检测项目是 Tailwind v3 还是 v4，并根据场景匹配最佳方案。
 ---
 
 # Tailwind SaaS Patterns
 
-这是一个参考手册 + 脚手架工具，用于在新建 Next.js SaaS 项目时用成熟的项目级 CSS 编排体系快速起步，并在后续开发中提供样式技巧查询。
+## 步骤 0：项目检测
 
-## 体系总览
+用户提到项目时，先检测 Tailwind 版本。
 
-此技能基于 shadcn/ui 风格的 CSS 变量体系，核心链路：
-
-```
-theme.css (HSL 裸值)
-  → globals.css (@import + @layer base 定义全局默认)
-    → tailwind.config.ts (CSS 变量映射为语义类名)
-      → lib/utils.ts (cn() 工具: clsx + tailwind-merge)
-        → components/ui/* (Button, Card, Badge...)
-          → components/blocks/* (Hero, Feature, Stats, CTA...)
-            → app/page.tsx (最终组装)
+```bash
+# 看 package.json
+cat package.json | grep -E '"tailwindcss"' | head -3
 ```
 
-## 两种操作模式
+- `"tailwindcss": "^3.x"` → **v3 模式**
+- `"tailwindcss": "^4.x"` 或 没有 tailwind.config, 但有 `@import "tailwindcss"` → **v4 模式**
 
-### 模式 A：脚手架模式
+检测结果决定后续走 v3 还是 v4 路径。**如果项目不明确，按 v4 处理**。
 
-用户说"新建项目"、"初始化"、"搭个结构"时触发。按以下步骤执行：
+### v3 vs v4 核心差异速查
 
-1. **创建 CSS 变量体系**
-   - 从 `templates/theme.css` 生成 `app/theme.css` — HSL 变量定义，含 `:root`（亮色）和 `.dark`（暗色）
-   - 从 `templates/globals.css` 生成 `app/globals.css` — 引入 theme.css + Tailwind 指令 + base 层全局样式
-
-2. **创建 Tailwind 配置**
-   - 从 `templates/tailwind.config.ts` 生成 `tailwind.config.ts` — 语义色映射、动画、container
-   - 从 `templates/lib/utils.ts` 生成 `lib/utils.ts` — cn() 工具函数
-
-3. **创建基础 UI 组件示例**（可选，视用户需求而定）
-   - 参考 templates/ui/ 下的文件（如果存在），或者直接在 SKILL.md 中给出模板
-
-   > 组件模板已内嵌在此 SKILL.md 中，见下方"基础 UI 组件模板"章节
-
-4. **创建 demo 落地页**
-   - 从 `templates/blocks/` 生成完整的 landing page 区块组件到 `components/blocks/`
-   - 生成一个演示用的 `app/page.tsx` 来组合这些区块
-
-5. **更新 layout**
-   - 设置 `<html suppressHydrationWarning>`
-   - body 上挂 `fontSans.variable` + 类名: `min-h-screen bg-background font-sans antialiased`
-   - 包裹 `<ThemeProvider attribute="class" disableTransitionOnChange>`
-
-### 模式 B：参考手册模式
-
-用户问"这个效果怎么写"、"布局怎么做"、"有什么技巧"时触发。根据问题类型读取对应参考文件：
-
-- **布局与间距技巧** → 读取 `references/layout-and-spacing.md`
-- **视觉效果技巧** → 读取 `references/visual-techniques.md`
-
-回答问题时应：
-- 直接给出 Tailwind 类名字符串，可复制即用
-- 解释每个技巧的**为什么**（原理）而非只说"这么写"
-- 结合实际场景举例，不要给孤立代码片段
+| 项目 | v3 | v4 |
+|------|----|----|
+| 配置位置 | `tailwind.config.ts` | `app.css` 中的 `@theme inline` |
+| 入口指令 | `@tailwind base/components/utilities` | `@import "tailwindcss"` |
+| 暗色模式 | `darkMode: ["class"]` | `@custom-variant dark (&:where(.dark, .dark *));` |
+| 插件 | `tailwindcss-animate` postcss 插件 | 内置，不需额外装 |
+| 构建工具 | PostCSS 插件 | 推荐 `@tailwindcss/vite` |
+| 容器查询 | 需额外装 `@tailwindcss/container-queries` | 内置 |
+| cn() 版本 | tailwind-merge ^2.x | tailwind-merge ^3.x |
 
 ---
 
-## CSS 变量体系设计原则
+<DETECTED-V3>
+## 模式 A：脚手架模式（v3 链路）
 
-（内嵌参考，无需额外文件）
+1. 创建 `app/theme.css` — 从 `templates/theme.css` 复制
+2. 创建 `app/globals.css` — 从 `templates/globals.css` 复制（注意 @import theme.css）
+3. 创建 `tailwind.config.ts` — 从 `templates/tailwind.config.ts` 复制
+4. 创建 `lib/utils.ts` — 从 `templates/lib/utils.ts` 复制
+5. UI 组件 / blocks / layout 更新 — 见下方通用步骤
+</DETECTED-V3>
 
-### 变量存储格式
+<DETECTED-V4>
+## 模式 A：脚手架模式（v4 链路 — 默认）
 
-HSL 变量存成**三个空格分隔的值**（不包裹 `hsl()`），方便在 JS 中拼接透明度：
+1. 删除（或不创建）`tailwind.config.ts` — v4 不需要
+2. 检查构建工具：
+   - Vite → `npm install tailwindcss @tailwindcss/vite` → `vite.config.ts` 添加 `tailwindcss()` 插件
+   - Next.js / PostCSS → `npm install tailwindcss @tailwindcss/postcss` → `postcss.config.js` 添加
+3. 创建 `app/app.css`（或 `app/globals.css`）— 从 `templates/v4/app.css` 复制
+   - 注意：用 `@import "tailwindcss"` 替代 `@tailwind` 指令
+4. 创建 `lib/utils.ts` — 从 `templates/v4/lib/utils.ts` 复制（注意 tailwind-merge 版本 ^3.x）
+5. 提醒用户阅读 `templates/v4/README-v4.md` 了解 v4 迁移要点
+</DETECTED-V4>
 
-```css
---primary: 24.6 95% 53.1%;
-/* 使用时: hsl(var(--primary))  → 纯色
-          hsl(var(--primary) / 0.8)  → 80% 透明度（Tailwind 的 /{opacity} 语法） */
+### 通用步骤（v3 & v4 共用）
+
+**layout.tsx 修改：**
+```tsx
+<html lang="zh-CN" suppressHydrationWarning>
+<body className={`${sansFont.variable} font-sans antialiased min-h-screen bg-background text-foreground`}>
+  <ThemeProvider attribute="class" disableTransitionOnChange>
+    {children}
+  </ThemeProvider>
+</body>
 ```
 
-### 语义色命名规范
+**Button 组件**：参考内嵌在 SKILL.md 底部的 shadcn/ui Button 模板（适用于两个版本）。
+**Card 组件**：同样见底部模板。
 
-每个语义角色有一对 DEFAULT + foreground：
-
-```
---{role}
---{role}-foreground
-```
-
-角色：`background`、`foreground`、`primary`、`secondary`、`muted`、`accent`、`destructive`、`card`、`popover`、`border`、`input`、`ring`
-
-### 主题切换机制
-
-`:root` 定义亮色值，`.dark` 定义暗色值，通过 `<html class="dark">` 切换。使用 `next-themes` 或自定义 ThemeProvider 来管理 class 切换。
-
-### globals.css 的全局默认
-
-```css
-@layer base {
-  * { @apply border-border; }        /* 所有元素有默认边框色 */
-  body { @apply bg-background text-foreground; }  /* 页面基础背景/文字 */
-}
-```
+> **blocks 说明**：本 skill 提供的 blocks 只是结构演示（templates/blocks/*），实际使用时请用 shadcn/ui CLI 生成（`npx shadcn@latest add`），然后再在本 skill 的参考手册模式下查询拼合技巧。
 
 ---
 
-## Tailwind Config Bridge 原则
+## 模式 B：参考手册模式
 
-```ts
-// tailwind.config.ts 核心映射模式
-colors: {
-  primary: {
-    DEFAULT: 'hsl(var(--primary))',
-    foreground: 'hsl(var(--primary-foreground))'
-  },
-  // ... 每个语义色同理
-},
-borderRadius: {
-  lg: 'var(--radius)',
-  md: 'calc(var(--radius) - 2px)',
-  sm: 'calc(var(--radius) - 4px)'
-}
+用户问样式/布局/色彩/动画相关问题。**根据问题类型自动匹配最佳参考文档**：
+
+### 场景匹配表
+
+| 用户说（关键词） | 匹配文档 | 解决的核心问题 |
+|-----------------|---------|--------------|
+| "颜色" "配色" "换色" "加个颜色" "调色" | **`references/color-system.md`** | 选色原则、扩展语义色、HSL/OKLCH、透明度用法 |
+| "动画" "入场" "动效" "过渡" "滚到才播" "shimmer" "marquee" "skeleton加载" | **`references/animation-and-motion.md`** | fade-in/fade-up、stagger、scroll-trigger、hover动效、reduce-motion |
+| "布局" "排版" "对齐" "grid" "flex" "响应式" "间距" "移动端" "断点" | **`references/responsive-and-layout.md`** | grid系统、断点策略、flex布局、:has()、container queries、section间距 |
+| "调试" "不生效" "没效果" "为什么" "样式冲突" "font" "字体" "变量" | **`references/practical-css-recipes.md`** | 调试方法、cn()版本匹配、@layer优先级、font loading、CSS变量技巧 |
+| "skeleton" "loading" "空状态" "错误" "加载中" "骨架" | **`references/component-states.md`** | skeleton组件、三态渲染（loading/empty/error）、图片加载占位 |
+| "v3 v4" "升级" "迁移" "版本" | **`references/practical-css-recipes.md`**（第7节）+ `templates/v4/README-v4.md` | 版本检测、迁移要点 |
+| "视觉" "效果" "渐变" "背景" "网格" "头像堆叠" "图标" | **`references/visual-techniques.md`** | 渐变文字、SVG网格、轮播渐变边缘、暗色logo切换等 |
+| "间距" "section" "container" "排版" "图文" "卡片" "nav" "header" | **`references/layout-and-spacing.md`** | section间距节奏、container、grid断点、图文排列、header/nav |
+| "表单" "输入" "验证" "提交" "form" "table" "表格" "数据列表" | **`references/forms-and-tables.md`** | 表单宽度控制、字段类型、验证状态、提交按钮、数据表格空态、CRUD页面组合 |
+| "登录" "注册" "auth" "控制台" "后台" "dashboard" "admin" "博客" "blog" | **`references/page-layouts.md`** | Auth居中卡片、Console侧边栏、Dashboard可折叠、Blog列表/详情、区块组合策略 |
+
+### 多关键词匹配
+
+如果用户的问题涉及多个领域（如"我做了个卡片列表动画，但加载时布局跳了"），按优先级读：
+
+1. **先定位核心问题** — 上表加粗的部分
+2. 读主要文档
+3. 如果还涉及其他文档的内容，顺带提一句"XX方面可以看看 XX 文档"
+
+---
+
+## 模式 C：调试/诊断模式
+
+用户说"不生效"、"报错"、"样式没出来"、"不知道哪里错了"时，按以下顺序排查：
+
+### 快速诊断三板斧
+
+**1. 先确认文件是否导入**
+```
+pages/_app.tsx 或 app/layout.tsx 中有没有 import "globals.css" 或 import "app.css"？
+```
+最简单也最常见的问题：文件名错了或者忘记 import。
+
+**2. 确认 CSS 变量存在**
+> 浏览器 DevTools → Elements → 选目标元素 → Computed → 搜 `--primary`
+> 如果找不到 → 变量没定义。检查 theme.css/app.css 是否有 `:root` 块。
+
+**3. 确认类名生效**
+> DevTools → 看目标元素的 Styles 面板，搜 `bg-primary`
+> 如果有但被划掉 → 被更高优先级的类名覆盖了（常见于 cn() 合并问题）。试 `!important` 临时确认。
+
+### 各问题类型速查
+
+| 症状 | 诊断入口 | 修复文档 |
+|------|---------|---------|
+| 颜色不对 | 先看变量值 → 看 tailwind 映射 | color-system.md |
+| 布局乱了 | 看断点 → 看 gap 数值 → 看容器宽度 | responsive-and-layout.md |
+| 动画没播 | 看 keyframe 名称 → 看 animation 引用名 | animation-and-motion.md |
+| 类名合并有问题 | 查 tailwind-merge 版本 | practical-css-recipes.md（第3节） |
+
+---
+
+## CSS 变量体系总览
+
+```
+theme.css (HSL 裸值) 或 v4 app.css (:root + .dark)
+  → @import 到 globals.css 或直接在 app.css 中
+    → v3: tailwind.config.ts 中映射为语义色
+    → v4: @theme inline { --color-*: hsl(var(--*)) }
+      → lib/utils.ts cn() 工具
+        → components/ui/* (Button, Card...)
+          → app/page.tsx
 ```
 
-所有颜色通过 `hsl(var(--x))` 映射，保证主题切换时所有引用类名（`bg-primary`、`text-muted-foreground`）自动响应。
+### 变量设计原则
 
-`containers` 配置：居中、2rem padding、最大宽 1200px。
+- **HSL 存裸值**（不含 `hsl()` 包裹），方便拼透明度：`hsl(var(--primary) / 0.8)`
+- **语义色成对出现**：每个 `--{role}` 都有 `--{role}-foreground`
+- **亮暗色统一变量名**：`:root` 亮、`.dark` 暗，引用方不变
+
+布局/视觉/颜色等细分技巧直接看对应的 reference 文件。
 
 ---
 
 ## 基础 UI 组件模板
 
-### Button (CVA 变体模式)
+### Button（两个版本通用）
 
 ```tsx
 import * as React from "react"
@@ -165,12 +194,7 @@ const buttonVariants = cva(
 )
 ```
 
-核心要点：
-- variant 里所有颜色引用**语义类名**（`bg-primary`, `hover:bg-accent`），不出现任何具体颜色值
-- 透明度用 Tailwind 的 `/{opacity}` 语法（如 `hover:bg-primary/90`）
-- CVA 的 className 通过 `cn()` 与外部传入的 className 合并
-
-### Card (纯 className 模式)
+### Card（两个版本通用）
 
 ```tsx
 const Card = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDivElement>>(
@@ -181,32 +205,4 @@ const Card = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDivElemen
     )} {...props} />
   )
 )
-```
-
-核心要点：默认样式写在 `cn()` 的第一个参数里，外部 className 通过第二个参数覆盖。
-
----
-
-## Scaffold 完成后告知用户
-
-脚手架搭建完成后，输出以下信息给用户：
-
-```
-样式体系已搭建完毕。
-
-使用的架构:
-  ├── app/theme.css          — HSL 变量（亮色/暗色）
-  ├── app/globals.css        — 全局样式导入 + @layer base
-  ├── tailwind.config.ts     — CSS 变量 → 语义类名映射
-  ├── lib/utils.ts           — cn() 工具函数
-  ├── components/blocks/     — 落地页区块组件
-  └── app/page.tsx           — demo 落地页
-
-核心技巧:
-  - 所有样式引用语义类名（bg-primary, text-muted-foreground），不写具体颜色
-  - 所有 section 用 py-16 间距节奏
-  - 响应式：手机默认单列，md: 两列，lg: 三列
-  - 暗色模式: 改 theme.css 的 .dark 块
-
-如需样式编写技巧，随时问我，我会查询参考文件给你指引。
 ```
