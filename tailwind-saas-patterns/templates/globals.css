@@ -1,0 +1,52 @@
+/* globals.css
+   ============================================
+   1. 导入 CSS 变量（HSL tokens）
+   2. Tailwind 三层指令
+   3. 全局基础样式（@layer base）
+   4. 可能会在此文件定义 sidebar 等扩展变量
+   ============================================ */
+
+/* 第一步：导入设计原子 */
+@import "theme.css";
+
+/* 第二步：Tailwind 三层 */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* 第三步：全局默认 */
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-background text-foreground;
+  }
+
+  /* Sidebar 变量（如使用）— 复用 theme.css 的变量 */
+  :root {
+    --sidebar-background: var(--background);
+    --sidebar-foreground: var(--foreground);
+    --sidebar-primary: var(--primary);
+    --sidebar-primary-foreground: var(--primary-foreground);
+    --sidebar-accent: var(--background);
+    --sidebar-accent-foreground: var(--primary);
+    --sidebar-border: var(--border);
+    --sidebar-ring: var(--ring);
+  }
+  .dark {
+    --sidebar-background: var(--background);
+    --sidebar-foreground: var(--foreground);
+    --sidebar-primary: var(--primary);
+    --sidebar-primary-foreground: var(--primary-foreground);
+    --sidebar-accent: var(--accent);
+    --sidebar-accent-foreground: var(--accent-foreground);
+    --sidebar-border: var(--border);
+    --sidebar-ring: var(--ring);
+  }
+}
+
+/* 第四步：其他全局样式 */
+html {
+  scroll-behavior: smooth;
+}

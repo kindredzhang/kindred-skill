@@ -1,0 +1,23 @@
+{
+  "skill_name": "tailwind-saas-patterns",
+  "evals": [
+    {
+      "id": 1,
+      "name": "scaffold-new-project",
+      "prompt": "我新建了一个 Next.js 项目，帮我按我们项目那套模式把样式体系搭建起来：theme.css、globals.css、tailwind.config、cn() 工具函数，再加一份 demo 落地页（Hero、Feature、Stats、Testimonial、FAQ、CTA、Footer）。页面要可以直接跑起来看到效果。",
+      "expected_output": "生成完整的样式体系文件和 demo 落地页组件，所有文件可直接使用"
+    },
+    {
+      "id": 2,
+      "name": "query-layout-technique",
+      "prompt": "我在写一个 Features 区块，用了 3 列 grid 但手机上看起来很挤。而且每个 card 的高度不一样，很不整齐。这个项目里是怎么处理这种布局的？",
+      "expected_output": "给出 gap 断点组合方案（默认单列 → md:2列 → lg:3列）、卡片高度对齐技巧"
+    },
+    {
+      "id": 3,
+      "name": "query-visual-effect",
+      "prompt": "我想给我的 hero 区域加一个渐变文字高亮效果，然后下面放几行品牌 Logo 展示（黑白色，暗色模式下自动反色）。这个项目的实现方式是什么？",
+      "expected_output": "给出 bg-gradient-to-r + bg-clip-text 和 dark:invert 的完整代码示例"
+    }
+  ]
+}
