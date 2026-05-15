@@ -1,0 +1,85 @@
+{
+  "eval_assertions": {
+    "project-structure-design": [
+      {
+        "name": "route-groups-mentioned",
+        "description": "Mentions route groups for layout layering (admin, console, locale, or legal)",
+        "type": "keyword"
+      },
+      {
+        "name": "provider-chain-mentioned",
+        "description": "Describes provider ordering (NextIntl → AuthSession → AppContext → ThemeProvider or similar)",
+        "type": "keyword"
+      },
+      {
+        "name": "models-services-split",
+        "description": "Recommends separating data access (models) from business logic (services)",
+        "type": "keyword"
+      },
+      {
+        "name": "i18n-middleware-strategy",
+        "description": "Mentions i18n middleware configuration or locale exclusion for legal/API routes",
+        "type": "keyword"
+      },
+      {
+        "name": "folder-structure-suggestion",
+        "description": "Provides concrete directory structure recommendation",
+        "type": "keyword"
+      }
+    ],
+    "crud-slot-implementation": [
+      {
+        "name": "slot-type-reference",
+        "description": "References TableSlotType or FormSlotType from types/slots/",
+        "type": "keyword"
+      },
+      {
+        "name": "data-driven-columns",
+        "description": "Shows column/field configuration as data objects not JSX",
+        "type": "keyword"
+      },
+      {
+        "name": "server-action-handler",
+        "description": "Mentions or shows 'use server' directive or server action for form submission",
+        "type": "keyword"
+      },
+      {
+        "name": "slot-variants-explained",
+        "description": "Distinguishes between dashboard slots and console slots",
+        "type": "keyword"
+      },
+      {
+        "name": "coupon-type-definition",
+        "description": "Provides type definition for coupon with code, discount_percent, expires_at fields",
+        "type": "keyword"
+      }
+    ],
+    "stripe-payment-flow": [
+      {
+        "name": "pricing-component-flow",
+        "description": "Describes client-side pricing component → checkout API flow",
+        "type": "keyword"
+      },
+      {
+        "name": "checkout-api-endpoint",
+        "description": "References /api/checkout or a checkout API route",
+        "type": "keyword"
+      },
+      {
+        "name": "order-before-stripe",
+        "description": "Mentions creating Order record before creating Stripe session",
+        "type": "keyword"
+      },
+      {
+        "name": "webhook-handling",
+        "description": "Mentions Stripe webhook to handle payment success callback",
+        "type": "keyword"
+      },
+      {
+        "name": "credits-granting",
+        "description": "Describes granting credits after successful payment",
+        "type": "keyword"
+      }
+    ]
+  }
+}

@@ -1,0 +1,23 @@
+{
+  "skill_name": "nextjs-saas-architecture",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "我正在用 Next.js 15 App Router 做一个新的 SaaS 项目，需要规划项目结构。主要功能包括：用户登录（Google OAuth）、国际化（中英文）、Landing Page、用户控制台（查看订单和 API Key）、管理后台（管理用户和订单）、Stripe 支付。你能帮我设计一下项目目录结构、路由组布局方案和 Provider 链吗？",
+      "expected_output": "给出项目目录结构、路由组布局方案（含 route group 嵌套结构）、Provider链顺序，并解释每层布局的职责和中间件的locale排除策略",
+      "files": []
+    },
+    {
+      "id": 2,
+      "prompt": "我想在管理后台加一个『优惠券管理』页面，需要列表展示所有优惠券和新增优惠券的表单。优惠券有 code、discount_percent、expires_at 字段。能用你们推荐的 slot 模式来实现吗？告诉我怎么定义 types、用哪个 slot 组件、以及数据流怎么走。",
+      "expected_output": "使用 TableSlot 和 FormSlot 模式实现 CRUD，给出类型定义、页面代码结构和数据流说明",
+      "files": []
+    },
+    {
+      "id": 3,
+      "prompt": "我需要在 landing page 上添加 Stripe 支付的订阅流程。用户选择月度/年度套餐后点击购买，跳转到 Stripe Checkout，支付成功后通过 webhook 给用户加 credits。整个流程的架构怎么设计？从前端 pricing 组件到后端 API 到 webhook 处理。",
+      "expected_output": "给出完整支付流程架构：Pricing block → /api/checkout → Order DB → Stripe session → Webhook → Credits 发放，包括状态管理和错误处理",
+      "files": []
+    }
+  ]
+}
